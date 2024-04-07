@@ -3,39 +3,46 @@
 '''
 # 3-D версия
 from math import *
-import matplotlib.pyplot as plt
 import numpy as np
-
-# если нужна будет работа с экселем
-from openpyxl import Workbook   
+import matplotlib.pyplot as plt
 
 # Исходные данные
-P_peak = 10  # pressure in GPa
-R = 0.5   #spot radius in mm
-HEL = 0.5 #до какого момента имеет смысл считать
-SampleHeight = 0    #высота пятна
+P_peak = 2.932  # pressure in GPa
+R = 0.7   #spot radius in mm
+HEL = P_peak * 0.1 #до какого момента имеет смысл считать
+SampleHeight = 5    #высота пятна
 
 r = 10   #на сколько строим функцию, по идее должна зависеть от R
+delta = 0  #смещение
+number_type = 0     #
 
-# функция распределения
-def functionPress(x, y):
-    return P_peak * exp(- ((x ** 2 + y ** 2) / (2 * R ** 2)))
 
-y = np.arange(-r, r, 0.08)
-x = np.arange(-r, r, 0.08)
+# функция распределения по Гауссу
+def gausFunctionPress(x, y):
+    return P_peak * exp(- (((x + delta) ** 2 + (y + delta) ** 2) / (2 * R ** 2)))
+
+
+y = np.arange(-r, r, 0.01)
+x = np.arange(-r, r, 0.01)
+
+angle = np.arange(0, 2 * np.pi, 0.1)
+
 
 X, Y, P = [], [], []
 for x_iter in x:
     for y_iter in y:
-        if functionPress(x_iter, y_iter) >= HEL:
-            P.append(functionPress(x_iter, y_iter))
+        if gausFunctionPress(x_iter, y_iter) >= HEL:
+            P.append(gausFunctionPress(x_iter, y_iter))
             X.append(x_iter)
             Y.append(y_iter)
 
 Z = [SampleHeight for i in range(len(X))]   # вообще говоря это не обязательно
 
+x, y = [], []
+
+
 #*********** генерация текстового документа *********
-file1 = open("D:\вуз\Нирс\питон\График давления для Ансис\PessureXYZ.txt", "w")
+file1 = open("PessureXYZ123.txt", "w")
 
 file1.write('x\ty\tz\tPressure\n')
 for i in range(len(X)):
@@ -43,7 +50,6 @@ for i in range(len(X)):
 
 file1.close()
 
-#*********** график **********
 fig = plt.figure()
 
 # syntax for 3-D projection
@@ -57,7 +63,7 @@ ax.scatter(X, Y, P, color = 'green')
 tetha = np.linspace(0, 2*np.pi, 100)
 x = R * np.cos(tetha)
 y = R * np.sin(tetha)
-z = [functionPress(x[0], y[0]) for i in range(len(y))]
+z = [gausFunctionPress(x[0], y[0]) for i in range(len(y))]
 
 ax.plot3D(x, y, z, 'red', linewidth = 5) 
 
@@ -70,4 +76,3 @@ ax.set_zlabel('Давление, ГПа')
 plt.tight_layout()
 
 plt.show()
-
