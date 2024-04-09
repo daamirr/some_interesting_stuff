@@ -4,7 +4,7 @@
 from math import *
 import matplotlib.pyplot as plt
 import numpy as np
-from openpyxl import Workbook
+# from openpyxl import Workbook
 
 #******** различные функции Гаусса
 def gausPressGleb(r, s):
@@ -26,7 +26,7 @@ Power = 4   # Энергия, Джоули
 tay = 60   # длительность импульса, ns
 
 gamma = 5/3     # адиабатическая что-то там
-alpha = 0.25    # подгоночный коэффициент, связанная с долей ионизации
+alpha = 0.5    # подгоночный коэффициент, связанная с долей ионизации
 
 # табличные данные, для титана Ti6Al4V брал от сюда doi: 10.1063/1.1303508
 p_w, p_tit = 1, 4.42  #density of water and titan, gram/cm^3 
@@ -38,7 +38,7 @@ Z2 = p_tit * D_tit * 1e5
 Z = 2 * Z2 * Z1 / (Z1 + Z2)
 
 R = 0.7   #spot radius in mm
-Intensity0 = Power / (tay * np.pi * (2*R/10) ** 2 / 4) # GW/cm^2
+Intensity0 = 9.5 #Power / (tay * np.pi * (2*R/10) ** 2 / 4) # GW/cm^2
 P_peak = 0.01 * ((alpha * Z * Intensity0) / (2 * alpha + 3)) ** 0.5  # pressure in GPa по Фабро
 
 
@@ -104,20 +104,19 @@ print(max(Pmodif))
 x_name = 'Расстояние от точки до центра пятна, мм'
 y_name = 'Давление, ГПа'
 
-plt.plot(r_argument, Pmodif, color = 'brown')
+plt.plot(r_argument, Pmodif, color = 'brown', label = f'I = {round(Intensity0, 2)}GW/cm^2\nP_peak = {round(max(Pmodif), 2)}')
 # plt.plot(r_argument, P, color = 'green')
 
 r_argument2 = [-R, -R, R, R]
 P_average = [0, P_peak, P_peak, 0]
-plt.plot(r_argument2, P_average)
+plt.plot(r_argument2, P_average, label = f'I = {round(Intensity0, 2)}GW/cm^2\nP_peak = {round(P_peak, 2)}GPa')
 
-plt.plot([-2, 2], [max(P) / 2 for i in range(2)], color = 'black')
-
+# plt.plot([-2, 2], [max(P) / 2 for i in range(2)], color = 'black')
 plt.grid()
 
 plt.xlabel(x_name)
 plt.ylabel(y_name)
-
+plt.legend()
 plt.show()
 
 ''''
